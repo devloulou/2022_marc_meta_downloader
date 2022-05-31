@@ -1,7 +1,7 @@
 import os
 import json
 
-from parameters import folder_path
+from utils.parameters import folder_path
 
 class FileHandler:
     allowed_formats = ['mkv', 'mp4']
@@ -26,6 +26,18 @@ class FileHandler:
         return True
 
 
+    @staticmethod
+    def write_image(image_path, image_link):
+        if os.path.exists(os.path.dirname(image_path)):
+            # ha létezik a json kiírásnál a json-t tartalmazó mappa, akkor mehet az írás
+            try:
+                with open(image_path, "wb") as f:
+                    f.write(image_link.read())
+            except Exception as e:
+                return False, str(e)
+        
+        return True
+
 
 if __name__ == '__main__':
     handler = FileHandler()
@@ -33,4 +45,4 @@ if __name__ == '__main__':
     file_list = handler.get_file_list()
     print(file_list)
 
-    handler.write_json(None, None)
+    #handler.write_json(None, None)

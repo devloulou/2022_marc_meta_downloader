@@ -9,9 +9,13 @@ class FileHandler:
     def __init__(self):
         pass
 
-    def get_file_list(self):
+    def get_movies(self):
         # Alien.mkv -> ['Alien', 'mkv']
         return [item for item in os.listdir(folder_path) if item.split('.')[-1] in self.allowed_formats]
+
+    @staticmethod
+    def get_files_from_folder(path):
+        return os.listdir(path)
 
     @staticmethod
     def write_json(json_path, data):
@@ -42,7 +46,7 @@ class FileHandler:
 if __name__ == '__main__':
     handler = FileHandler()
 
-    file_list = handler.get_file_list()
+    file_list = handler.get_movies()
     print(file_list)
 
     #handler.write_json(None, None)

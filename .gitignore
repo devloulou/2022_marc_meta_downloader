@@ -1,3 +1,5 @@
 .vscode
 venv
 utils/__pycache__
+movie_data
+posters

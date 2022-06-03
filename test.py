@@ -1,20 +1,65 @@
-import pprint
-import tmdbsimple as tmdb
-from urllib.request import urlopen
+from pymongo import mongo_client
 
-tmdb.API_KEY = "454b6ca4172e455fe7a7d8395c10d6d9"
+# 1. kapcsolatat létrehozása
+# 2. database object
+# 3. collection object
+# 4. minden utasítás a collection-objecten keresztül fog történni
+#######################################
 
-image_path_string = 'https://image.tmdb.org/t/p/original/bk9GVjN4kxmGekswNigaa5YIdr5.jpg'
+#1.
+uri = "mongodb://localhost:27017"
+connection = mongo_client.MongoClient(uri)
 
-search = tmdb.Search()
+#2.
+database = connection['test']
 
-movie_data = search.movie(query="The")
+#3.
+col = database['only_test']
 
-pprint.pprint(movie_data['results'], indent=4)
+# 4.
+# test adat
+my_dict = {
+    "auto": "BMW",
+    "color": "white",
+    "motor_type": "benzin"
+}
 
-# temp = urlopen(image_path_string).read()
+my_dict2 = {
+    "auto": "Volvo",
+    "color": "white",
+    "motor_type": "benzin"
+}
 
-# print(temp)
+my_dict3 = {
+    "auto": "BMW",
+    "color": "black",
+    "motor_type": "benzin"
+}
 
-# with open('alien.jpg', "wb") as poster:
-#     poster.write(urlopen(image_path_string).read())
+many_doc = (my_dict, my_dict2, my_dict3)
+
+# insert to mongodb
+
+#col.insert_one(my_dict)
+result = col.insert_many(many_doc, ordered=False)
+
+
+# delete:
+
+#result = col.delete_one({'auto': {"$in": ['Volvo']} })
+#result = col.delete_many({'auto': {"$in": ['Volvo']} })
+
+# print(result.raw_result)
+# print(result.deleted_count)
+
+# update:
+
+filter_st = {"auto": "Opel"}
+update_statement = {'$set': {"auto": "Opel", "color": "yellow"}}
+
+#col.update_one(filter=filter_st, update=update_statement, upsert=True)
+
+# select vagy read
+
+for item in col.find({'auto': 'BMW'}):
+    print(item)

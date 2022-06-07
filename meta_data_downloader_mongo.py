@@ -1,4 +1,6 @@
 import os
+from bson import ObjectId
+
 from utils.file_handler import FileHandler
 from utils.search_wrapper import SearchWrapper
 from utils.parameters import movie_data, poster_path
@@ -31,20 +33,17 @@ def loader(file_handler):
 def delete_unnecessary_meta(file_handler):
     mongo = MongoHandler()
     movie_list = [item.split('.')[0].upper() for item in file_handler.get_movies()]
-
     meta_data = [doc['original_title'].upper() for doc in mongo.get_meta_data()]
-
     need_to_delete = [item for item in meta_data if item not in movie_list]
-
-    print(need_to_delete)
-    exit()
+    filter_statement = {"upper_movie_name": {"$in": need_to_delete }}
+    need_to_delete = [doc for doc in mongo.get_meta_data(filter_statement)]
 
     for item in need_to_delete:        
-        image_path = os.path.join(poster_path, f"{item}.jpeg")
-        meta_path = os.path.join(movie_data, f"{item}.json")
-
+        image_path = item['image_location']
         os.remove(image_path)
-        os.remove(meta_path)
+        delete_statement = {'_id': ObjectId(item['_id'])}
+
+        mongo.delete_doc(delete_statement)
 
 
 def main():
@@ -57,6 +56,6 @@ def main():
 if __name__ == '__main__':
     file_handler = FileHandler()
     #main()
-    loader(file_handler)
+    #loader(file_handler)
 
-    #delete_unnecessary_meta(file_handler)
+    delete_unnecessary_meta(file_handler)

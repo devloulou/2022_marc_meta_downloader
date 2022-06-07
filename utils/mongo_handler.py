@@ -26,6 +26,10 @@ class MongoHandler:
 
         return self.create_col_object().delete_one(filter_statement).deleted_count
 
+    def get_meta_data(self, filter_statement={}):
+        return self.create_col_object().find(filter_statement)
+
+
 if __name__ == '__main__':
     mongo = MongoHandler()
 

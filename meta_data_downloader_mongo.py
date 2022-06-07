@@ -54,8 +54,4 @@ def main():
 
 
 if __name__ == '__main__':
-    file_handler = FileHandler()
-    #main()
-    #loader(file_handler)
-
-    delete_unnecessary_meta(file_handler)
+    main()

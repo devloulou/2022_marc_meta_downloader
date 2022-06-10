@@ -1,5 +1,4 @@
 import os
-from bson import ObjectId
 
 from utils.file_handler import FileHandler
 from utils.search_wrapper import SearchWrapper
@@ -7,8 +6,9 @@ from utils.parameters import (movie_data,
                                 poster_path,
                                 meta_table,
                                 select_movie_titles, 
-                                insert_meta_table)
-from utils.mongo_handler import MongoHandler
+                                insert_meta_table,
+                                select_data_for_deletion,
+                                delete_movie)
 from utils.db_handler import PostgreDB
 
 
@@ -43,19 +43,17 @@ def loader(file_handler):
 
 
 def delete_unnecessary_meta(file_handler):
-    mongo = MongoHandler()
+    sql = PostgreDB()
     movie_list = [item.split('.')[0].upper() for item in file_handler.get_movies()]
-    meta_data = [doc['original_title'].upper() for doc in mongo.get_meta_data()]
-    need_to_delete = [item for item in meta_data if item not in movie_list]
-    filter_statement = {"upper_movie_name": {"$in": need_to_delete }}
-    need_to_delete = [doc for doc in mongo.get_meta_data(filter_statement)]
+
+    meta_data = { item[0] : item[1:]  for item in sql.run_sql(select_data_for_deletion)}
+    
+    need_to_delete = [item for item in meta_data.keys() if item not in movie_list]
 
     for item in need_to_delete:        
-        image_path = item['image_location']
-        os.remove(image_path)
-        delete_statement = {'_id': ObjectId(item['_id'])}
-
-        mongo.delete_doc(delete_statement)
+        data = meta_data[item]
+        os.remove(data[1])
+        sql.run_sql(delete_movie.format(id=data[0]))
 
 def initialize_postgres_objects():
     sql = PostgreDB()
@@ -71,7 +69,7 @@ def main():
     file_handler = FileHandler()
 
     initialize_postgres_objects()
-    #delete_unnecessary_meta(file_handler)
+    delete_unnecessary_meta(file_handler)
     loader(file_handler)
 
 

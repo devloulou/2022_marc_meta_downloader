@@ -31,3 +31,15 @@ vote_count, image_location) values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
 select_movie_titles = """
     select upper(original_title) as title from meta_data t
 """
+
+select_data_for_deletion = """
+select
+upper(original_title) as title,
+t.id,
+t.image_location
+from meta_data t
+"""
+
+delete_movie = """
+delete from meta_data where id = {id}
+"""

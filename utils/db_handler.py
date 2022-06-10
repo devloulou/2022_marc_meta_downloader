@@ -32,7 +32,8 @@ class PostgreDB:
                     conn.rollback()
                     return False, str(e)
 
-                if sql_script[0:6].lower() == 'select':
+                if 'select' in sql_script.lower(): # lehet olyan delete, update utasítást is íni
+                    # ahol szerepl select szó
                     return cur.fetchall()
         
         return True
